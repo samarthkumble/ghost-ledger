@@ -24,6 +24,8 @@ class _Text(HTMLParser):
             self._skip += 1
         if tag in ("br", "p", "div", "tr", "li", "h1", "h2", "h3", "table"):
             self.out.append("\n")
+        elif tag in ("td", "th") and self.out and not self.out[-1].endswith("\n"):
+            self.out.append(" | ")  # keep table cells apart: "Account Number | XXXX 6127"
 
     def handle_endtag(self, tag):
         if tag in ("script", "style") and self._skip:

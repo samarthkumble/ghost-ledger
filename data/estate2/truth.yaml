@@ -1,0 +1,284 @@
+person: Leela Menon (1951-2026), retired nurse, Kochi. Fictional. HELD-OUT estate,
+  frozen before any model run.
+executor: Arjun Menon (son). Fictional.
+date_of_death: '2026-05-30'
+items:
+  B1:
+    kind: bank_account
+    institution: Periyar Bank
+    ident: '6127'
+    status: active
+  B2:
+    kind: pension
+    institution: Periyar Bank
+    ident: 0934
+    alt:
+    - '6127'
+    status: active
+  B3:
+    kind: fixed_deposit
+    institution: Malabar Gramin Bank
+    ident: '8319'
+    status: matured_unclaimed
+  B4:
+    kind: fixed_deposit
+    institution: Periyar Bank
+    ident: '4410'
+    status: closed
+    note: 'TRAP: closed on maturity in 2022, proceeds already paid.'
+  B5:
+    kind: life_insurance
+    institution: Backwaters Life
+    ident: '0453'
+    status: active
+  B6:
+    kind: mutual_fund
+    institution: Arabian Sea Mutual Fund
+    ident: 0291
+    status: active
+  B7:
+    kind: shares_physical
+    institution: Nila Pharmaceuticals
+    ident: '3561'
+    status: at_risk_iepf
+  B8:
+    kind: loan
+    institution: Konkan Housing Finance
+    ident: '7712'
+    status: active
+    note: 'Liability: inform the lender, check loan cover.'
+  B9:
+    kind: credit_card
+    institution: Lotus Card Services
+    ident: '3388'
+    status: active
+  B10:
+    kind: ppf
+    institution: Sabari Post Office
+    ident: '8842'
+    status: active
+  B11:
+    kind: demat
+    institution: Malabar Capital
+    ident: '2910'
+    alt:
+    - '2205'
+    status: active
+  B12:
+    kind: health_insurance
+    institution: Kerala Care Health
+    ident: '1902'
+    status: active
+  B13:
+    kind: bank_account
+    institution: Kochi Co-operative Bank
+    ident: '5530'
+    status: inoperative
+  T1:
+    kind: subscription
+    institution: MelodyBox
+    ident: ''
+    alt:
+    - '3388'
+    status: active
+  T2:
+    kind: subscription
+    institution: Coastal Herald
+    ident: 0815
+    status: active
+  T3:
+    kind: subscription
+    institution: FitLife Studio
+    ident: '2291'
+    status: active
+  U1:
+    kind: utility
+    institution: Kochi Water Authority
+    ident: '8210'
+    status: active
+traps:
+  closed:
+  - B4
+  scam_emails:
+  - scm-0
+  - scm-1
+  - scm-2
+  - scm-3
+  promo_emails:
+  - pro-0
+  - pro-1
+  - pro-2
+emails:
+  pyr-sb-0:
+    kind: asset
+    refs:
+    - B1
+  pyr-sb-1:
+    kind: asset
+    refs:
+    - B1
+  pyr-sb-2:
+    kind: asset
+    refs:
+    - B1
+  pyr-pen-0:
+    kind: asset
+    refs:
+    - B2
+  pyr-pen-1:
+    kind: asset
+    refs:
+    - B2
+  mgb-td-0:
+    kind: asset
+    refs:
+    - B3
+  mgb-td-1:
+    kind: asset
+    refs:
+    - B3
+  pyr-fd-0:
+    kind: asset_closed
+    refs:
+    - B4
+  pyr-fd-1:
+    kind: asset_closed
+    refs:
+    - B4
+  bwl-0:
+    kind: asset
+    refs:
+    - B5
+  bwl-1:
+    kind: asset
+    refs:
+    - B5
+  asm-0:
+    kind: asset
+    refs:
+    - B6
+  asm-1:
+    kind: asset
+    refs:
+    - B6
+  nila-0:
+    kind: asset
+    refs:
+    - B7
+  khf-0:
+    kind: liability
+    refs:
+    - B8
+  khf-1:
+    kind: liability
+    refs:
+    - B8
+  lot-0:
+    kind: liability
+    refs:
+    - B9
+  lot-1:
+    kind: liability
+    refs:
+    - B9
+  ppf-0:
+    kind: asset
+    refs:
+    - B10
+  mcap-0:
+    kind: asset
+    refs:
+    - B11
+  kch-0:
+    kind: asset
+    refs:
+    - B12
+  kcb-0:
+    kind: asset
+    refs:
+    - B13
+  mel-0:
+    kind: subscription
+    refs:
+    - T1
+  mel-1:
+    kind: subscription
+    refs:
+    - T1
+  mel-2:
+    kind: subscription
+    refs:
+    - T1
+  chd-0:
+    kind: subscription
+    refs:
+    - T2
+  chd-1:
+    kind: subscription
+    refs:
+    - T2
+  fit-0:
+    kind: subscription
+    refs:
+    - T3
+  kwa-0:
+    kind: utility
+    refs:
+    - U1
+  kwa-1:
+    kind: utility
+    refs:
+    - U1
+  pro-0:
+    kind: promo
+    refs: []
+  pro-1:
+    kind: promo
+    refs: []
+  pro-2:
+    kind: promo
+    refs: []
+  scm-0:
+    kind: scam
+    refs:
+    - B5
+  scm-1:
+    kind: scam
+    refs: []
+  scm-2:
+    kind: scam
+    refs:
+    - B2
+  scm-3:
+    kind: scam
+    refs: []
+  life-00:
+    kind: personal
+    refs: []
+  life-01:
+    kind: personal
+    refs: []
+  life-02:
+    kind: personal
+    refs: []
+  life-03:
+    kind: personal
+    refs: []
+  life-04:
+    kind: personal
+    refs: []
+  life-05:
+    kind: personal
+    refs: []
+  life-06:
+    kind: personal
+    refs: []
+  life-07:
+    kind: personal
+    refs: []
+  life-08:
+    kind: personal
+    refs: []
+  life-09:
+    kind: personal
+    refs: []

@@ -1,0 +1,17 @@
+From: Arabian Sea Mutual Fund <statements@arabiansea-mf.example>
+To: Leela Menon <leela.menon51@mail.example>
+Subject: Account statement
+Date: Fri, 12 Apr 2024 10:15:00 +0530
+Message-ID: <asm-0@estate2.example>
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<h3>Arabian Sea Mutual Fund - Account Statement</h3>
+<p>Investor: LEELA MENON &nbsp; Folio: 8830291/04</p>
+<table border=3D"1"><tr><th>Scheme</th><th>Units</th><th>Value (Rs.)</th></tr>
+<tr><td>Arabian Sea Conservative Hybrid Fund - Growth</td><td>3,401.112</td><=
+td>1,02,377.80</td></tr></table>
+<p>Nominee: Arjun Menon</p>
+</body></html>

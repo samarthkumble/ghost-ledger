@@ -64,10 +64,40 @@ def check(item: Item, e: Email) -> str | None:
     return None
 
 
-def settle_status(item: Item) -> str:
-    """Downgrade strong statuses the evidence doesn't support, rather than rejecting the item."""
-    if item.status == "closed" and not CLOSED_WORDS.search(item.evidence):
+def settle_status(item: Item, e: Email | None = None) -> str:
+    """Downgrade strong statuses the email doesn't support, rather than rejecting the item.
+
+    The model quotes one sentence, but "matured on 14-06-2024." and "held as matured unclaimed deposit"
+    are often neighbouring sentences, so the support is looked for in the whole email."""
+    text = e.full_text if e is not None else item.evidence
+    if item.status == "closed" and not CLOSED_WORDS.search(text):
         return "unknown"
-    if item.status == "matured_unclaimed" and not (MATURED_WORDS.search(item.evidence) and UNCLAIMED_WORDS.search(item.evidence)):
-        return "unknown" if not MATURED_WORDS.search(item.evidence) else "active"
+    if item.status == "matured_unclaimed" and not (MATURED_WORDS.search(text) and UNCLAIMED_WORDS.search(text)):
+        return "unknown" if not MATURED_WORDS.search(text) else "active"
     return item.status
+
+
+DEMAT_WORDS = re.compile(r"\b(demat|dp id|client id|depository participant)\b", re.I)
+PAYMENT_METHOD = re.compile(r"(auto-?pay|charged to|paid (by|with|via)|debited from)\b.{0,40}\bcard\b|\bcard ending\b.{0,40}\b(charged|auto-?pay)", re.I)
+
+
+def normalize(items: list[Item], e: Email) -> list[Item]:
+    """Fixed domain rules applied to what the model says, before grounding.
+
+    - Shares the email says are held in a demat account are a demat holding, not physical shares.
+    - A card that only appears as how a bill or subscription is paid is not a holding of the biller;
+      the card itself shows up in its own issuer's statements.
+    """
+    out = []
+    for it in items:
+        if it.kind == "shares_physical" and DEMAT_WORDS.search(it.evidence):
+            it.kind = "demat"
+        if it.kind == "credit_card" and PAYMENT_METHOD.search(it.evidence) and not institution_issues_cards(it, e):
+            continue
+        out.append(it)
+    return out
+
+
+def institution_issues_cards(it: Item, e: Email) -> bool:
+    """True when the email itself is from the card issuer (a card statement), not from a biller."""
+    return bool(re.search(r"(card statement|statement for .{0,40}card|card services)", e.full_text, re.I))

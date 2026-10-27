@@ -121,7 +121,7 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
       <h1>When someone dies, their money doesn't tell the family where it is.</h1>
       <p class="lede">Ghost Ledger reads a loved one's mailbox on your own computer and writes down every deposit, policy, folio and pension it finds, with the email that proves each one. Then it helps you claim them, one approved letter at a time.</p>
       <div class="actions">
-        <a class="btn primary" href="{{VIDEO_URL}}">Watch the 3-minute demo</a>
+        <a class="btn primary" href="{{VIDEO_URL}}">{{VIDEO_LABEL}}</a>
         <a class="btn quiet" href="{{REPO_URL}}">Get the code</a>
       </div>
     </div>
@@ -132,7 +132,7 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
       <p class="entry flag"><span>Physical shares, Hampi Textiles ···2117</span><span class="amt">IEPF risk</span></p>
       <p class="entry"><span>StreamBox Premium, card ···9012</span><span class="amt">₹499 / month</span><small>still charging, three months after he died.</small></p>
       <p class="entry struck"><span>Savings, Coastal Bank ···2210</span><span class="amt">closed 2021</span></p>
-      <div class="total"><span>{{G_HOLDINGS}} holdings · {{G_SCAMS}} scam emails ignored</span><span>0 invented</span></div>
+      <div class="total"><span>{{TOTAL_LEFT}}</span><span>{{TOTAL_RIGHT}}</span></div>
     </div>
   </div>
 
@@ -140,7 +140,7 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
     <div class="cols">
       <div>
         <h2 class="sec">₹2.2 lakh crore is waiting to be claimed in India.</h2>
-        <p>That is the total sitting unclaimed in bank deposits, shares, insurance, provident fund and mutual funds, according to a 1 Finance analysis reported in December 2025. A large share of it belonged to people who died, and whose families never found out what they had.</p>
+        <p>That is the total sitting unclaimed in bank deposits, shares, insurance, provident fund and mutual funds, according to a 1 Finance analysis reported in December 2025. Some of it belonged to people who died before anyone in the family knew it existed.</p>
         <p>Nobody keeps a list. Statements go to one person's inbox for years: an FD renewal notice here, a policy premium receipt there, a dividend email from a company he bought shares in before the internet. When that person dies, the inbox is the only map.</p>
       </div>
       <div>
@@ -180,7 +180,7 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
 <footer><div class="wrap">
   <p><strong>Ghost Ledger</strong> is open source ({{LICENSE}}). It gives general guidance from public sources such as RBI, SEBI, AMFI, IEPF, EPFO and insurers. It is not legal advice.</p>
   <p>Built for the DEV Hacktoberfest Open-Source AI Challenge, “Ghost in the Machine”. Marigolds guide the dead home on Día de los Muertos and line every funeral in India. This one helps what they left behind find its way home.</p>
-  <p><a href="{{REPO_URL}}">Code</a> · <a href="{{DEMO_URL}}">Demo report</a> · <a href="{{POST_URL}}">Write-up</a></p>
+  <p><a href="{{REPO_URL}}">Code</a> · <a href="{{DEMO_URL}}">Demo report</a>{{POST_LINK}}</p>
 </div></footer>
 </body>
 </html>

@@ -104,7 +104,7 @@ def page(holdings: list[Holding], ignored: list[dict], est: Estate, n_emails: in
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ghost Ledger · {_e(est.deceased)}</title><style>{CSS}</style></head><body><main>
 <h1>What {_e(est.deceased)} left behind</h1>
-<p class="lede">Read from his mailbox by {_e(model)} on this computer, {date.today():%d %b %Y}. Every line below quotes the email it came from. Account numbers are masked.</p>
+<p class="lede">Read from {_e(est.pronoun)} mailbox by {_e(model)} on this computer, {date.today():%d %b %Y}. Every line below quotes the email it came from. Account numbers are masked.</p>
 <div class="stats">{stat(s['holdings'], 'holdings found')}{stat(s['claims'], 'to claim', 'hot')}{stat(s['urgent'], 'need attention first', 'warn')}
 {stat(s['still_charging'], 'still charging after death', 'warn')}{stat(s['scams'], 'scam emails ignored')}{stat(f"{s['read']}/{s['emails']}", 'emails read by the model')}</div>
 <h2>What to do, in order</h2>{''.join(rows)}

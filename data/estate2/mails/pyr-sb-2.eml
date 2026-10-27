@@ -1,0 +1,20 @@
+From: Periyar Bank <alerts@periyarbank.example>
+To: Leela Menon <leela.menon51@mail.example>
+Subject: e-Statement 2026-04 | Periyar Bank
+Date: Thu, 02 Apr 2026 10:15:00 +0530
+Message-ID: <pyr-sb-2@estate2.example>
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<html><body>
+<p>Namaskaram Smt. LEELA MENON,</p>
+<p>Your monthly statement is ready.</p>
+<table border="1">
+<tr><td>Account</td><td>Savings Bank - Senior Citizen</td></tr>
+<tr><td>Account Number</td><td>XXXX XXXX 6127</td></tr>
+<tr><td>Branch</td><td>Edappally, Kochi</td></tr>
+<tr><td>Closing balance</td><td>&#8377; 2,96,430.15</td></tr>
+</table>
+<p>Periyar Bank Ltd. | This is an auto-generated message.</p>
+</body></html>

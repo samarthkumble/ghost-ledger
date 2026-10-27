@@ -98,11 +98,12 @@ def _items(data: dict) -> list[Item]:
 
 
 def _ground(items: list[Item], e: Email) -> list[Item]:
+    items = grounding.normalize(items, e)
     for it in items:
         why = grounding.check(it, e)
         it.ok, it.reason = why is None, why or ""
         if it.ok:
-            it.status = grounding.settle_status(it)
+            it.status = grounding.settle_status(it, e)
     return items
 
 

@@ -153,3 +153,27 @@ def test_baseline_runs_and_is_scored(emails):
     hs, ign = ledger.build(emails, scan.readings, EST.date_of_death)
     s = evaluate.score(hs, ign, TRUTH)
     assert s["scam_emails_used"] == 0 and s["closed_account_claimed"] == 0
+
+
+# ------------------------------------------------------------------ rules added after the first Gemma run
+def test_matured_unclaimed_supported_by_the_next_sentence(by_id):
+    e = by_id["mal-fd-1"]
+    it = Item("fixed_deposit", "Malnad Co-operative Bank", "MCB/FD/00417703", "matured_unclaimed",
+              "Your Fixed Deposit Receipt No. MCB/FD/00417703 matured on 14-06-2024.")
+    assert grounding.settle_status(it, e) == "matured_unclaimed"
+    assert grounding.settle_status(it, by_id["mal-fd-0"]) == "active"
+
+
+def test_demat_held_shares_are_not_physical(by_id):
+    e = by_id["dmt-div-0"]
+    it = Item("shares_physical", "Deccan Cements Ltd", "DP ID IN301926, Client ID XXXX6650", "active",
+              "credited for 120 shares held in your demat account with Bharat Securities Ltd.")
+    assert grounding.normalize([it], e)[0].kind == "demat"
+
+
+def test_card_used_to_pay_a_bill_is_not_a_holding(by_id):
+    bill, statement = by_id["air-0"], by_id["kav-cc-0"]
+    autopay = Item("credit_card", "Airwave Telecom", "9012", "active", "Auto-pay is active on card ending 9012.")
+    assert grounding.normalize([autopay], bill) == []
+    card = Item("credit_card", "Kaveri Bank", "9012", "active", "Your statement for Kaveri Platinum Credit Card ending 9012 is ready.")
+    assert grounding.normalize([card], statement) == [card]

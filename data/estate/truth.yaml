@@ -49,6 +49,8 @@ items:
     status: active
     note: 'No nominee: claim needs legal-heir documents.'
   A9:
+    alt:
+    - '1926'
     kind: demat
     institution: Bharat Securities
     ident: '6650'
@@ -60,6 +62,9 @@ items:
     status: at_risk_iepf
     note: Physical shares, unclaimed dividends, may already be with IEPF.
   A11:
+    alt:
+    - '1122'
+    - '4321'
     kind: provident_fund
     institution: EPFO
     ident: '1187'
@@ -76,22 +81,30 @@ items:
     status: active
     note: 'Liability: inform the bank, stop auto-debits.'
   A14:
+    alt:
+    - '4821'
     kind: pension
     institution: Kaveri Bank
     ident: '1604'
     status: active
     note: Stop the pension; spouse may apply for family pension.
   A15:
+    alt:
+    - '4821'
     kind: gold_bond
     institution: Kaveri Bank
     ident: '2731'
     status: active
   S1:
+    alt:
+    - '9012'
     kind: subscription
     institution: StreamBox
     ident: ''
     status: active
   S2:
+    alt:
+    - '9012'
     kind: subscription
     institution: Airwave Telecom
     ident: '3021'

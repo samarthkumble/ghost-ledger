@@ -16,9 +16,6 @@ import yaml
 from .grounding import inst_tokens
 from .ledger import Holding
 
-# other identifiers that legitimately point at the same holding (an email can quote either)
-ALTERNATES = {"A9": {"1926"}, "A11": {"1122", "4321"}, "A14": {"4821"}, "A15": {"4821"},
-              "S1": {"9012"}, "S2": {"9012"}}
 STATUS_MAP = {"at_risk_iepf": "at_risk"}
 
 
@@ -33,7 +30,7 @@ def _tok(name: str) -> str:
 
 def _ids(tid: str, t: dict) -> set[str]:
     ident = str(t.get("ident") or "")
-    return ({ident} if ident else set()) | ALTERNATES.get(tid, set())
+    return ({ident} if ident else set()) | {str(a) for a in t.get("alt", [])}
 
 
 def _same_inst(a: str, b: str) -> bool:

@@ -15,7 +15,7 @@ from .routes import route_for
 from .schema import Email, Reading
 
 LONG_NUMBER = re.compile(r"\b[A-Z]{0,4}[/-]?\d[\dA-Z/-]{5,}\b")
-DATE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4}")
+DATE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4}|\d{4}-\d{2}")  # dates and financial years (2017-18)
 PAN = re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b")
 
 
@@ -51,13 +51,23 @@ class Holding:
     def route(self) -> dict:
         return route_for(self.kind, self.status)
 
-    def same_as(self, kind: str, institution: str, last4: str, ident_digits: str) -> bool:
+    def same_as(self, kind: str, institution: str, last4: str, ident_digits: str, evidence: str = "") -> bool:
+        if kind != self.kind:
+            return False
+        # the same long number (a DP ID, a folio) is the same holding, whoever the email is from
+        runs = set(re.findall(r"\d{6,}", ident_digits))
+        if runs and any(r in d for r in runs for d in self.idents):
+            return True
         toks = inst_tokens(institution)
-        if kind != self.kind or (toks[0] if toks else institution.lower()) != self.inst_key:
+        if (toks[0] if toks else institution.lower()) != self.inst_key:
             return False
         if not last4 or not self.last4:
             return kind in NEEDS_NO_ID
-        return last4 == self.last4 or any(last4 in d for d in self.idents) or self.last4 in ident_digits
+        if last4 == self.last4 or any(last4 in d for d in self.idents) or self.last4 in ident_digits:
+            return True
+        # one email quotes the account, another the PPO: the earlier evidence already names this number
+        ev_digits = re.sub(r"\D", "", " ".join(e["quote"] for e in self.evidence))
+        return last4 in ev_digits or self.last4 in re.sub(r"\D", "", evidence)
 
     @classmethod
     def from_dict(cls, d: dict) -> "Holding":
@@ -92,6 +102,7 @@ def build(emails: list[Email], readings: list[Reading], date_of_death: str = "")
     by_id = {e.id: e for e in emails}
     holdings: list[Holding] = []
     names: dict[int, Counter] = {}
+    last4s: dict[int, Counter] = {}
     ignored: list[dict] = []
     for r in sorted(readings, key=lambda r: by_id[r.email_id].date or ""):
         e = by_id[r.email_id]
@@ -104,14 +115,15 @@ def build(emails: list[Email], readings: list[Reading], date_of_death: str = "")
         for it in r.items:
             if not it.ok:
                 continue
-            digits = re.sub(r"\D", "", it.identifier or "")
-            h = next((h for h in holdings if h.same_as(it.kind, it.institution, it.last4, digits)), None)
+            digits = " ".join(re.findall(r"\d+", it.identifier or ""))
+            h = next((h for h in holdings if h.same_as(it.kind, it.institution, it.last4, digits, it.evidence)), None)
             if h is None:
                 h = Holding(it.kind, it.institution, it.last4, first_seen=day)
                 holdings.append(h)
                 names[id(h)] = Counter()
-            if not h.last4 and it.last4:
-                h.last4 = it.last4
+                last4s[id(h)] = Counter()
+            if it.last4:
+                last4s[id(h)][it.last4] += 1
             if digits:
                 h.idents.add(digits)
             names[id(h)][it.institution] += 1
@@ -122,6 +134,8 @@ def build(emails: list[Email], readings: list[Reading], date_of_death: str = "")
             _update_status(h, it.status)
     for h in holdings:
         h.institution = names[id(h)].most_common(1)[0][0]
+        if last4s[id(h)]:
+            h.last4 = last4s[id(h)].most_common(1)[0][0]  # the number most emails use
     ranked = sorted(holdings, key=lambda h: (ACTION_ORDER.get(h.route["action"], 9),
                                              h.status not in ("matured_unclaimed", "at_risk"), h.kind, h.institution))
     return ranked, ignored

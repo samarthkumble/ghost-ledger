@@ -58,7 +58,7 @@ def cmd_scan(a) -> int:
     if not a.baseline:
         msg = gemma.doctor(a.model)
         print(msg, file=sys.stderr)
-        if msg.startswith("✗"):
+        if msg.startswith("✗") and not a.cached:
             return 2
     print(f"{len(emails)} emails in {a.mailbox}", file=sys.stderr)
     scan = pipeline.run(emails, reader, _progress)
@@ -79,7 +79,7 @@ def cmd_eval(a) -> int:
     if not a.baseline_only:
         msg = gemma.doctor(a.model)
         print(msg, file=sys.stderr)
-        if msg.startswith("✗"):
+        if msg.startswith("✗") and not a.cached:
             return 2
         runs.append((a.model, gemma_reader(a.model, a.cache)))
     for name, reader in runs:
@@ -98,9 +98,11 @@ def cmd_eval(a) -> int:
     for name, r in results.items():
         print(f"\n{name}: missed {r['_missed']} invented {r['_invented']} wrong kind {r['_wrong_kind']} "
               f"wrong institution {r['_wrong_institution']} wrong status {r['_wrong_status']} leaks {r['_leaks']} {extra[name]}")
+    name = Path(a.mail).resolve().parent.name  # "estate" or "estate2"
     Path("eval").mkdir(exist_ok=True)
-    Path("eval/results.json").write_text(json.dumps({"results": results, "runs": extra}, indent=1), encoding="utf-8")
-    Path("eval/results.md").write_text(evaluate.table(results) + "\n", encoding="utf-8")
+    Path(f"eval/results-{name}.json").write_text(json.dumps({"results": results, "runs": extra}, indent=1), encoding="utf-8")
+    Path(f"eval/results-{name}.md").write_text(evaluate.table(results) + "\n", encoding="utf-8")
+    print(f"\nSaved eval/results-{name}.json", file=sys.stderr)
     return 0
 
 
@@ -176,10 +178,12 @@ def main(argv=None) -> int:
     s.add_argument("mailbox")
     s.add_argument("--out", default="out")
     s.add_argument("--baseline", action="store_true", help="regex only, no model")
+    s.add_argument("--cached", action="store_true", help="use saved model answers without Ollama")
     e = sub.add_parser("eval")
     e.add_argument("--mail", default="data/estate/mails")
     e.add_argument("--truth", default="data/estate/truth.yaml")
     e.add_argument("--baseline-only", action="store_true")
+    e.add_argument("--cached", action="store_true", help="re-score saved model answers without Ollama")
     l = sub.add_parser("letter")
     l.add_argument("n", type=int)
     l.add_argument("--out", default="out")
