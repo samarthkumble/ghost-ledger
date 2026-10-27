@@ -96,7 +96,7 @@ def cmd_eval(a) -> int:
                        "wall_s": round(time.perf_counter() - t0)}
     print("\n" + evaluate.table(results))
     for name, r in results.items():
-        print(f"\n{name}: missed {r['_missed']} invented {r['_invented']} wrong kind {r['_wrong_kind']} "
+        print(f"\n{name}: missed {r['_missed']} invented {r['_invented']} duplicates {r['_duplicates']} wrong kind {r['_wrong_kind']} "
               f"wrong institution {r['_wrong_institution']} wrong status {r['_wrong_status']} leaks {r['_leaks']} {extra[name]}")
     name = Path(a.mail).resolve().parent.name  # "estate" or "estate2"
     Path("eval").mkdir(exist_ok=True)

@@ -16,46 +16,58 @@ LABELS = [("holdings_found", "Holdings found (of 15)"), ("subscriptions_found", 
 KEY = {"holdings_found", "invented", "closed_account_claimed", "scam_emails_used"}
 
 
+def _cell(res: dict, name: str, key: str) -> str:
+    return html.escape(str(res.get(name, {}).get(key, "–")).split("/")[0]) if name in res else "–"
+
+
 def main(report_dir: str = "out", **links):
     import os
     links = {**{k: os.environ[k] for k in ("VIDEO_URL", "POST_URL", "REPO_URL") if os.environ.get(k)}, **links}
     LINKS.update(links)
-    data = json.loads((ROOT / "eval/results.json").read_text(encoding="utf-8"))
-    res, runs = data["results"], data.get("runs", {})
-    names = list(res)
-    head = "".join(f"<th class=n>{html.escape(n)}</th>" for n in names)
-    rows = "".join(f"<tr{' class=key' if k in KEY else ''}><td>{html.escape(lbl)}</td>"
-                   + "".join(f"<td class=n>{html.escape(str(res[n][k]).split('/')[0])}</td>" for n in names) + "</tr>"
-                   for k, lbl in LABELS)
-    table = f"<table><thead><tr><th>On 75 emails</th>{head}</tr></thead><tbody>{rows}</tbody></table>"
-    g = next((n for n in names if "gemma" in n), None)
-    if g:
-        r, gh = runs.get(g, {}), res[g]
-        note = (f"{g} read {r.get('emails_read', '?')} emails at a median {r.get('median_s_per_email', '?')} s each on a "
-                f"Ryzen 5 5500U laptop CPU; {r.get('retried', 0)} needed a retry after the checks rejected something. "
-                "Truth, scoring and both runs are in the repo: python -m ghostledger eval.")
-        left = f"{str(gh['holdings_found']).split('/')[0]} of 15 holdings found · {6 - gh['scam_emails_used']} scams ignored"
-        right = "0 invented" if gh["invented"] == 0 else f"{gh['invented']} invented"
-    else:
-        note = ("Gemma 4's run on the synthetic estate is in progress on a laptop CPU; its column is added here when it "
-                "finishes. The baseline column is real. Reproduce both with: python -m ghostledger eval.")
-        left, right = "15 holdings hidden in 75 emails", "6 scams planted"
+    tuned = json.loads((ROOT / "eval/results-estate.json").read_text(encoding="utf-8"))
+    held = json.loads((ROOT / "eval/results-estate2.json").read_text(encoding="utf-8"))
+    g = next((n for n in tuned["results"] if "gemma" in n), None)
+    b = "regex baseline"
+    rows_def = [("holdings_found", "Holdings and debts found", "15", "13"),
+                ("subscriptions_found", "Subscriptions and bills found", "5", "4"),
+                ("flagged_statuses_correct", "Matured / at-risk / dormant / closed caught", "5", "4"),
+                ("invented", "Invented entries", "", ""), ("duplicates", "Duplicate entries", "", ""),
+                ("wrong_kind", "Filed as the wrong kind", "", ""), ("wrong_institution", "Filed under the wrong institution", "", ""),
+                ("closed_account_claimed", "Closed account put on the claim list", "", ""),
+                ("scam_emails_used", "Scam emails used as evidence", "", ""),
+                ("masking_leaks", "Full account numbers in the report", "", "")]
+    key_rows = {"holdings_found", "invented", "closed_account_claimed", "scam_emails_used"}
+    head = ("<tr><th rowspan=2>Metric</th><th colspan=2 class=n>Raghavendra, 75 emails<br><small>rules fixed after run 1</small></th>"
+            "<th colspan=2 class=n>Leela, 47 emails<br><small>held out, never tuned on</small></th></tr>"
+            f"<tr><th class=n>Regex</th><th class=n>{html.escape(g or 'Gemma')}</th><th class=n>Regex</th><th class=n>{html.escape(g or 'Gemma')}</th></tr>")
+    body = ""
+    for k, label, n1, n2 in rows_def:
+        cells = [_cell(tuned["results"], b, k), _cell(tuned["results"], g, k), _cell(held["results"], b, k), _cell(held["results"], g, k)]
+        if n1:
+            cells = [f"{cells[0]} / {n1}", f"{cells[1]} / {n1}", f"{cells[2]} / {n2}", f"{cells[3]} / {n2}"]
+        body += f"<tr{' class=key' if k in key_rows else ''}><td>{html.escape(label)}</td>" + "".join(f"<td class=n>{c}</td>" for c in cells) + "</tr>"
+    table = f"<div class=tablewrap><table><thead>{head}</thead><tbody>{body}</tbody></table></div>"
+    r1, r2 = tuned["runs"].get(g, {}), held["runs"].get(g, {})
+    note = (f"Gemma 4 E4B read {r1.get('emails_read')} + {r2.get('emails_read')} emails on a Ryzen 5 5500U laptop CPU "
+            f"(median {r1.get('median_s_per_email')} s and {r2.get('median_s_per_email')} s per email). "
+            "Its one held-out mistake: a metro trip receipt paid by card became a utility bill. The first run on Raghavendra's "
+            "mailbox had one invented holding, one wrong kind and one missed 'matured' flag; those came from my checking code, "
+            "fixed before the held-out estate was written and frozen. Reproduce: python -m ghostledger eval.")
+    gh = held["results"][g]
+    left = f"{str(gh['holdings_found']).split('/')[0]} of 13 found on a held-out mailbox"
+    right = f"{gh['invented']} false entry" if gh["invented"] == 1 else f"{gh['invented']} false entries"
     video = LINKS["VIDEO_URL"]
-    extra = {"VIDEO_URL": video or "#how", "VIDEO_LABEL": "Watch the demo" if video else "See how it works",
-             "POST_LINK": f' · <a href="{LINKS["POST_URL"]}">Write-up</a>' if LINKS["POST_URL"] else ""}
-    fill = {**LINKS, **extra, "EVAL_TABLE": table, "EVAL_NOTE": html.escape(note), "TOTAL_LEFT": left, "TOTAL_RIGHT": right}
+    fill = {**LINKS, "VIDEO_URL": video or "#how", "VIDEO_LABEL": "Watch the demo" if video else "See how it works",
+            "POST_LINK": f' · <a href="{LINKS["POST_URL"]}">Write-up</a>' if LINKS["POST_URL"] else "",
+            "EVAL_TABLE": table, "EVAL_NOTE": html.escape(note), "TOTAL_LEFT": left, "TOTAL_RIGHT": right}
     page = (ROOT / "site/template.html").read_text(encoding="utf-8")
     for k, v in fill.items():
         page = page.replace("{{" + k + "}}", v)
-    if not g:  # no model run yet: the only report would be the baseline's, so don't link a demo
-        page = page.replace('<a href="{{DEMO_URL}}">Demo report</a>'.replace("{{DEMO_URL}}", LINKS["DEMO_URL"]), "")
-        page = page.replace(" · </p>", "</p>").replace("<p> · ", "<p>")
     assert "{{" not in page, page[page.index("{{"):page.index("{{") + 40]
     dist = ROOT / "site/dist"
     (dist / "demo").mkdir(parents=True, exist_ok=True)
     (dist / "index.html").write_text(page, encoding="utf-8")
-    if g:
-        shutil.copy(ROOT / report_dir / "report.html", dist / "demo/report.html")
+    shutil.copy(ROOT / report_dir / "report.html", dist / "demo/report.html")
     print("built", dist)
 
 

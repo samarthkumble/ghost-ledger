@@ -15,7 +15,7 @@ from .routes import route_for
 from .schema import Email, Reading
 
 LONG_NUMBER = re.compile(r"\b[A-Z]{0,4}[/-]?\d[\dA-Z/-]{5,}\b")
-DATE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{4}|\d{4}-\d{2}")  # dates and financial years (2017-18)
+DATE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{2}[-/.]\d{2}[-/.]\d{4}|\d{4}-\d{2}")  # dates and financial years (2017-18)
 PAN = re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b")
 
 
@@ -43,9 +43,8 @@ class Holding:
     after_death: list[str] = field(default_factory=list)  # dates of charges/notices after the date of death
 
     @property
-    def inst_key(self) -> str:
-        toks = inst_tokens(self.institution)
-        return toks[0] if toks else self.institution.lower()
+    def inst_key(self) -> tuple:
+        return inst_key(self.institution)
 
     @property
     def route(self) -> dict:
@@ -58,8 +57,7 @@ class Holding:
         runs = set(re.findall(r"\d{6,}", ident_digits))
         if runs and any(r in d for r in runs for d in self.idents):
             return True
-        toks = inst_tokens(institution)
-        if (toks[0] if toks else institution.lower()) != self.inst_key:
+        if not same_institution(inst_key(institution), self.inst_key):
             return False
         if not last4 or not self.last4:
             return kind in NEEDS_NO_ID
@@ -82,6 +80,17 @@ class Holding:
                 "status": self.status, "first_seen": self.first_seen, "last_seen": self.last_seen,
                 "emails": len(self.evidence), "action": self.route["action"], "after_death": self.after_death,
                 "evidence": [{**ev, "quote": mask(ev["quote"])} for ev in self.evidence]}
+
+
+def inst_key(name: str) -> tuple:
+    toks = inst_tokens(name)
+    return tuple(toks) if toks else (name.lower(),)
+
+
+def same_institution(a: tuple, b: tuple) -> bool:
+    """"Kaveri Bank" = "Kaveri Bank Ltd." = "Kaveri Bank Cards", but "Kochi Metro" != "Kochi Water Authority"."""
+    n = min(len(a), len(b))
+    return a[:n] == b[:n]
 
 
 ACTION_ORDER = {"CLAIM (URGENT)": 0, "CLAIM": 1, "STOP + FAMILY PENSION": 2, "INFORM + CLOSE": 3, "INFORM": 4,

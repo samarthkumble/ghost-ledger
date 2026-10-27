@@ -81,7 +81,9 @@ ol.steps h3{font:600 19px/1.3 Hind,sans-serif;margin:0 0 6px}
 ol.steps p{font-size:16px;margin:0;color:var(--text)}
 ol.steps .who{display:block;font-size:14px;color:var(--ink-soft);margin-top:8px}
 
-table{border-collapse:collapse;width:100%;max-width:760px;font-size:17px;margin-top:20px}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;max-width:900px;font-size:17px;margin-top:20px}
+th small{font-weight:400;color:var(--ink-soft)}
 th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule)}
 th{font-weight:600}
 td.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -145,7 +147,7 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
       </div>
       <div>
         <p class="quote">“Our records show that the maturity amount for policy no. XXXXX3958 is still unpaid as the discharge requirements have not been received.”<cite>Nilgiri Life Insurance, May 2023. One of two emails about this policy in four years.</cite></p>
-        <p>Raghavendra Rao is fictional. His mailbox is 75 synthetic emails written to look like a real Indian retiree's, including six scam emails pretending to be his bank, four promotions that name funds he never held, and one account he closed years before he died. Every number on this site comes from running Ghost Ledger on it.</p>
+        <p>Raghavendra Rao is fictional. His mailbox is 75 synthetic emails written to look like a real Indian retiree's, including six scam emails pretending to be his bank, four promotions that name funds he never held, and one account he closed years before he died. Every number on this site comes from running Ghost Ledger on it, and on a second mailbox it had never seen.</p>
       </div>
     </div>
   </section>
@@ -161,8 +163,8 @@ footer p{max-width:46em;font-size:15px;margin:8px 0}
   </section>
 
   <section id="results">
-    <h2 class="sec">Measured on the synthetic estate</h2>
-    <p>Same mailbox, same filters and the same checks, so the only difference is who reads the email: Gemma, or a regex baseline written the usual way.</p>
+    <h2 class="sec">Measured on two invented estates</h2>
+    <p>Two invented mailboxes with a written answer key. Both readers get the same filters and the same checks, so the only difference is who reads the email: Gemma, or a regex baseline written the usual way. The second mailbox was written and frozen after the first run, then read once.</p>
     {{EVAL_TABLE}}
     <p class="note">{{EVAL_NOTE}}</p>
   </section>

@@ -34,8 +34,11 @@ def _ids(tid: str, t: dict) -> set[str]:
 
 
 def _same_inst(a: str, b: str) -> bool:
-    ta, tb = _tok(a), _tok(b)
-    return ta.startswith(tb) or tb.startswith(ta)
+    from .ledger import inst_key, same_institution
+    ka, kb = inst_key(a), inst_key(b)
+    if same_institution(ka, kb):
+        return True
+    return ka[0].startswith(kb[0]) or kb[0].startswith(ka[0]) if len(ka) == 1 or len(kb) == 1 else False  # EPF ~ EPFO
 
 
 def match(holdings: list[Holding], truth: dict) -> dict:
@@ -46,6 +49,7 @@ def match(holdings: list[Holding], truth: dict) -> dict:
     wrong_kind: dict[str, Holding] = {}
     wrong_inst: dict[str, Holding] = {}
     invented: list[Holding] = []
+    duplicates: list[Holding] = []
 
     def id_ok(tid: str, t: dict, h: Holding) -> bool:
         ids = _ids(tid, t)
@@ -58,15 +62,19 @@ def match(holdings: list[Holding], truth: dict) -> dict:
         both = [(tid, t) for tid, t in by_id if _same_inst(t["institution"], h.institution)]
         exact = [tid for tid, t in both if t["kind"] == h.kind]
         if exact:
-            tid = next((x for x in exact if x not in found), exact[0])
-            found.setdefault(tid, h)
+            tid = next((x for x in exact if x not in found), None)
+            if tid is None:
+                duplicates.append(h)  # a second entry for something already on the list
+            else:
+                found[tid] = h
         elif both:
             wrong_kind.setdefault(both[0][0], h)
-        elif [tid for tid, t in by_id if t["kind"] == h.kind]:
+        elif h.last4 and [tid for tid, t in by_id if t["kind"] == h.kind]:  # same number, other name
             wrong_inst.setdefault([tid for tid, t in by_id if t["kind"] == h.kind][0], h)
         else:
             invented.append(h)
-    return {"found": found, "wrong_kind": wrong_kind, "wrong_institution": wrong_inst, "invented": invented}
+    return {"found": found, "wrong_kind": wrong_kind, "wrong_institution": wrong_inst, "invented": invented,
+            "duplicates": duplicates}
 
 
 def full_identifiers(mail_dir: str | Path, truth: dict) -> set[str]:
@@ -102,6 +110,7 @@ def score(holdings: list[Holding], ignored: list[dict], truth: dict, report_text
         "invented": len(m["invented"]),
         "wrong_kind": len(m["wrong_kind"]),
         "wrong_institution": len(m["wrong_institution"]),
+        "duplicates": len(m["duplicates"]),
         "status_correct": f"{len(status_ok)}/{len(m['found'])}",
         "flagged_statuses_correct": f"{sum(t in status_ok for t in flagged)}/{len(flagged)}",
         "closed_account_claimed": len(closed_claimed),
@@ -110,6 +119,7 @@ def score(holdings: list[Holding], ignored: list[dict], truth: dict, report_text
         "masking_leaks": len(leaks),
         "_missed": sorted(t for t in items if t not in m["found"]),
         "_invented": [f"{h.kind} {h.institution} {h.last4}" for h in m["invented"]],
+        "_duplicates": [f"{h.kind} {h.institution} {h.last4}" for h in m["duplicates"]],
         "_wrong_kind": {t: h.kind for t, h in m["wrong_kind"].items()},
         "_wrong_institution": {t: h.institution for t, h in m["wrong_institution"].items()},
         "_wrong_status": {t: f"{m['found'][t].status} (truth {items[t]['status']})" for t in m["found"] if t not in status_ok},
@@ -118,7 +128,7 @@ def score(holdings: list[Holding], ignored: list[dict], truth: dict, report_text
 
 
 def table(results: dict[str, dict]) -> str:
-    rows = ["holdings_found", "subscriptions_found", "invented", "wrong_kind", "wrong_institution", "status_correct",
+    rows = ["holdings_found", "subscriptions_found", "invented", "duplicates", "wrong_kind", "wrong_institution", "status_correct",
             "flagged_statuses_correct", "closed_account_claimed", "scam_emails_used", "promo_emails_used", "masking_leaks"]
     names = list(results)
     out = ["| metric | " + " | ".join(names) + " |", "|---|" + "---|" * len(names)]
