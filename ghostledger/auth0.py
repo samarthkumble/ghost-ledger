@@ -220,8 +220,8 @@ def poll_approval(auth_req_id: str) -> tuple[str, int]:
         return "pending", max(6, int(m.group(1)) if m else 10)
     if err == "access_denied":
         return "denied", 0
-    if err == "expired_token":
-        return "expired", 0
+    if err == "expired_token" or (err == "invalid_grant" and "expired" in body.get("error_description", "").lower()):
+        return "expired", 0  # the push timed out on the phone; the workflow asks again later
     raise AuthError(f"CIBA poll failed ({r.status_code}): {body or r.text[:200]}")
 
 
