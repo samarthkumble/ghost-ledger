@@ -4,6 +4,17 @@
   python -m ghostledger scan  MAILBOX [--estate estate.yaml] [--out out] [--baseline]
   python -m ghostledger eval  [--mail data/estate/mails] [--truth data/estate/truth.yaml]
   python -m ghostledger letter N [--out out]
+
+Durable mode (Temporal + Auth0):
+  python -m ghostledger login                 sign in as the executor (Auth0)
+  python -m ghostledger connect-gmail         put Gmail access in Auth0 Token Vault
+  python -m ghostledger test-approval         send one Guardian push to your phone
+  python -m ghostledger worker                run the Temporal worker (leave it running)
+  python -m ghostledger start-scan MAILBOX    read the mailbox as a durable workflow
+  python -m ghostledger claim 1 2 5           open claim workflows for holdings #1, #2, #5
+  python -m ghostledger board [--watch]       see every claim's state (also out/claims.html)
+  python -m ghostledger approve CLAIM_ID yes  (console approver only)
+  python -m ghostledger replied CLAIM_ID "text"   mark a reply that came by post or phone
 """
 from __future__ import annotations
 
@@ -16,6 +27,7 @@ from pathlib import Path
 import yaml
 
 from . import baseline, evaluate, gemma, ledger, letters, mailbox, pipeline, report
+from .outputs import write_outputs
 from .schema import reading_from_dict, reading_to_dict
 
 
@@ -37,23 +49,6 @@ def gemma_reader(model: str, cache: str):
         print(f"        -> {found}{flag}  {took:.0f}s", file=sys.stderr, flush=True)
         return r
     return read
-
-
-def write_outputs(out: Path, emails, scan, est: letters.Estate, model: str) -> tuple[list, list]:
-    holdings, ignored = ledger.build(emails, scan.readings, est.date_of_death)
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "readings.json").write_text(json.dumps([reading_to_dict(r) for r in scan.readings], indent=1), encoding="utf-8")
-    (out / "ledger.json").write_text(json.dumps({"estate": est.__dict__, "holdings": [h.to_dict() for h in holdings],
-                                                 "ignored": ignored}, indent=1), encoding="utf-8")
-    (out / "report.md").write_text(report.markdown(holdings, ignored, est, len(emails), scan.read_count, model), encoding="utf-8")
-    (out / "report.html").write_text(report.page(holdings, ignored, est, len(emails), scan.read_count, model), encoding="utf-8")
-    ldir = out / "letters"
-    ldir.mkdir(exist_ok=True)
-    for i, h in enumerate(holdings, 1):
-        if letters.needs_letter(h):
-            (ldir / f"{i:02d}-{h.kind}-{h.last4 or 'x'}.txt").write_text(
-                f"Subject: {letters.subject(h, est)}\n\n{letters.body(h, est)}\n", encoding="utf-8")
-    return holdings, ignored
 
 
 def cmd_scan(a) -> int:
@@ -116,6 +111,60 @@ def cmd_letter(a) -> int:
     return 0
 
 
+def cmd_auth(a) -> int:
+    from . import auth0
+    try:
+        if a.cmd == "login":
+            who = auth0.login()
+            print(f"Signed in as {who.get('name') or who.get('email')} ({who.get('sub')}). Refresh token saved in .secrets/")
+        elif a.cmd == "connect-gmail":
+            done = auth0.connect_gmail()
+            print(f"Gmail connected to Token Vault ({done.get('id')}), scopes: {', '.join(done.get('scopes') or [])}")
+            print("Checking: getting a Gmail token from Token Vault ...", "ok" if auth0.google_token() else "failed")
+        elif a.cmd == "test-approval":
+            print("Check your phone (Auth0 Guardian) ...")
+            print("Result:", auth0.approve_blocking("Ghost Ledger test: approve this"))
+        else:
+            print(json.dumps({k: v for k, v in auth0.load().items() if k != "refresh_token"}, indent=1))
+    except auth0.AuthError as ex:
+        print(f"✗ {ex}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def cmd_durable(a) -> int:
+    import asyncio
+
+    from . import config, durable
+    if a.cmd == "worker":
+        try:
+            asyncio.run(durable.run_worker())
+        except KeyboardInterrupt:
+            print("Worker stopped. Workflows are safe and will continue when you start it again.")
+    elif a.cmd == "start-scan":
+        asyncio.run(durable.start_scan(a.mailbox, a.estate, a.out, a.model, a.cache, not a.no_follow))
+    elif a.cmd == "claim":
+        asyncio.run(durable.start_claims(a.numbers, a.out, a.estate, a.approver or config.APPROVER,
+                                         a.day_seconds or config.DAY_SECONDS, a.wait_days))
+    elif a.cmd == "board":
+        async def loop():
+            while True:
+                await durable.board(a.out)
+                if not a.watch:
+                    return
+                await asyncio.sleep(5)
+                print("-" * 60)
+        try:
+            asyncio.run(loop())
+        except KeyboardInterrupt:
+            pass
+    elif a.cmd == "approve":
+        asyncio.run(durable.signal(a.workflow_id, "approve", "approved" if a.decision == "yes" else "denied"))
+    elif a.cmd == "replied":
+        asyncio.run(durable.signal(a.workflow_id, "replied", a.text))
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="ghostledger", description="Find what someone left behind, from their mailbox.")
     p.add_argument("--model", default=gemma.DEFAULT_MODEL)
@@ -134,7 +183,35 @@ def main(argv=None) -> int:
     l = sub.add_parser("letter")
     l.add_argument("n", type=int)
     l.add_argument("--out", default="out")
+    sub.add_parser("login")
+    sub.add_parser("connect-gmail")
+    sub.add_parser("test-approval")
+    sub.add_parser("whoami")
+    sub.add_parser("worker")
+    ss = sub.add_parser("start-scan")
+    ss.add_argument("mailbox")
+    ss.add_argument("--out", default="out")
+    ss.add_argument("--no-follow", action="store_true")
+    c = sub.add_parser("claim")
+    c.add_argument("numbers", type=int, nargs="+")
+    c.add_argument("--out", default="out")
+    c.add_argument("--approver", default=None, choices=["guardian", "console"])
+    c.add_argument("--day-seconds", type=int, default=None, help="length of one day; 86400 real, ~20 for a demo")
+    c.add_argument("--wait-days", type=int, default=15)
+    b = sub.add_parser("board")
+    b.add_argument("--out", default="out")
+    b.add_argument("--watch", action="store_true")
+    ap = sub.add_parser("approve")
+    ap.add_argument("workflow_id")
+    ap.add_argument("decision", choices=["yes", "no"])
+    rp = sub.add_parser("replied")
+    rp.add_argument("workflow_id")
+    rp.add_argument("text", nargs="?", default="")
     a = p.parse_args(argv)
+    if a.cmd in ("login", "connect-gmail", "test-approval", "whoami"):
+        return cmd_auth(a)
+    if a.cmd in ("worker", "start-scan", "claim", "board", "approve", "replied"):
+        return cmd_durable(a)
     if a.cmd == "doctor":
         print(gemma.doctor(a.model))
         return 0

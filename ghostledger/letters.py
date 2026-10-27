@@ -88,3 +88,33 @@ def body(h: Holding, est: Estate, today: date | None = None, follow_up: int = 0)
 
 def needs_letter(h: Holding) -> bool:
     return h.status != "closed" and h.route["action"] not in ("NOTHING (closed)",)
+
+
+# Where to go when an institution doesn't answer. Banks, deposits, PPF, pension and cards: RBI's Integrated
+# Ombudsman (after 30 days without a reply). Insurance: Bima Bharosa / Insurance Ombudsman. Funds, demat and
+# listed shares: SEBI SCORES. EPF: EPFiGMS.
+REGULATOR = {
+    **dict.fromkeys(["bank_account", "fixed_deposit", "ppf", "gold_bond", "pension", "credit_card", "loan"],
+                    ("RBI Integrated Ombudsman", "https://cms.rbi.org.in")),
+    **dict.fromkeys(["life_insurance", "health_insurance"], ("IRDAI Bima Bharosa", "https://bimabharosa.irdai.gov.in")),
+    **dict.fromkeys(["mutual_fund", "demat", "shares_physical"], ("SEBI SCORES", "https://scores.sebi.gov.in")),
+    "provident_fund": ("EPFO grievance portal (EPFiGMS)", "https://epfigms.gov.in"),
+}
+
+
+def escalation(h: Holding, est: Estate, sent_on: list[str], today: date | None = None) -> dict:
+    who, portal = REGULATOR.get(h.kind, ("the institution's grievance officer", ""))
+    what = KIND_WORDS.get(h.kind, h.kind)
+    ref = f" ending {h.last4}" if h.last4 else ""
+    dates = ", ".join(sent_on)
+    body = "\n".join([
+        f"Complaint to: {who}" + (f" ({portal})" if portal else ""),
+        f"Against: {h.institution}", f"Date: {(today or date.today()):%d-%m-%Y}", "",
+        f"Subject: No response to death claim intimation for the {what}{ref} of late {est.deceased}", "",
+        f"{est.deceased} passed away on {est.date_of_death}. As {est.pronoun} {est.relation} and executor I wrote to "
+        f"{h.institution} on {dates} asking for the claim procedure for the {what}{ref}. I have received no reply "
+        "or acknowledgement number.", "",
+        "I request your office to direct the institution to acknowledge the claim and share the procedure.", "",
+        "Copies of the letters sent are attached.", "", est.executor, est.executor_email])
+    return {"to_portal": portal, "regulator": who,
+            "subject": f"Complaint: no response from {h.institution} on {what}{ref}", "body": body}

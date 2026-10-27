@@ -7,3 +7,5 @@ out*/
 # a real mailbox must never be committed
 mailbox/
 *.mbox
+.secrets/
+.env

@@ -59,6 +59,13 @@ class Holding:
             return kind in NEEDS_NO_ID
         return last4 == self.last4 or any(last4 in d for d in self.idents) or self.last4 in ident_digits
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "Holding":
+        last4 = (d.get("identifier") or "").replace("X", "")
+        h = cls(d["kind"], d["institution"], last4, d.get("status", "unknown"), d.get("first_seen", ""),
+                d.get("last_seen", ""), set(), list(d.get("evidence", [])), list(d.get("after_death", [])))
+        return h
+
     def to_dict(self) -> dict:
         return {"kind": self.kind, "institution": self.institution,
                 "identifier": f"XXXX{self.last4}" if self.last4 else "",
