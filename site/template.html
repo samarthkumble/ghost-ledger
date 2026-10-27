@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Ledger</title>
+<meta name="description" content="A local Gemma model reads a loved one's mailbox and finds the deposits, policies and folios they left behind, with the email that proves each one.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada:ital@0;1&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cloth:#8f1d1d; --cloth-deep:#6e1414; --thread:#e8b923;
+  --paper:#fffdf6; --rule:#c9d6ee; --margin:#d6453d;
+  --ink:#1f2a5c; --ink-soft:#4f5a86; --marigold:#f2a007; --leaf:#3f6b3a;
+  --page:#f3efe2; --text:#1d2238;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --paper:#1c2033; --rule:#2c3452; --ink:#c9d3ff; --ink-soft:#97a2d2; --page:#141726; --text:#e8eaf6;
+  --cloth:#7a1a1a; --cloth-deep:#5c1111; --margin:#e0675f; --leaf:#8fc185}}
+:root[data-theme=dark]{--paper:#1c2033;--rule:#2c3452;--ink:#c9d3ff;--ink-soft:#97a2d2;--page:#141726;--text:#e8eaf6;
+  --cloth:#7a1a1a;--cloth-deep:#5c1111;--margin:#e0675f;--leaf:#8fc185}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--text);font:400 18px/1.6 Hind,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid var(--marigold);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* the bahi-khata cover: red cloth with a stitched thread */
+header.cover{background:var(--cloth);color:#fff7e0;position:relative}
+header.cover::after{content:"";position:absolute;left:0;right:0;bottom:10px;border-bottom:2px dashed var(--thread);opacity:.85}
+.cover .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:18px;padding-bottom:30px;flex-wrap:wrap}
+.mark{display:flex;align-items:center;gap:12px;font:400 26px/1 "Tiro Kannada",Georgia,serif;text-decoration:none}
+.mark svg{flex:none}
+.cover nav{display:flex;gap:20px;flex-wrap:wrap;font-weight:500}
+.cover nav a{text-decoration:none;border-bottom:1px solid transparent}
+.cover nav a:hover{border-bottom-color:var(--thread)}
+
+/* hero: a ledger page being written */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px;align-items:start;padding:56px 0 72px}
+h1{font:400 clamp(34px,4.6vw,56px)/1.08 "Tiro Kannada",Georgia,serif;margin:0 0 22px;color:var(--text);letter-spacing:-.005em}
+.lede{font-size:20px;max-width:34em;color:var(--text);margin:0 0 28px}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 20px;border-radius:6px;font-weight:600;text-decoration:none;border:2px solid var(--cloth)}
+.btn.primary{background:var(--cloth);color:#fff7e0}
+.btn.primary:hover{background:var(--cloth-deep)}
+.btn.quiet{color:var(--cloth)}
+:root[data-theme=dark] .btn.quiet{color:var(--text)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn.quiet{color:var(--text)}}
+
+.ledger{background:var(--paper);border-radius:4px 10px 10px 4px;box-shadow:0 1px 0 var(--rule),0 18px 40px -24px rgba(40,20,10,.45);
+  position:relative;padding:22px 22px 26px 64px;
+  background-image:linear-gradient(to bottom,transparent 31px,var(--rule) 31px,var(--rule) 32px);background-size:100% 32px;background-position:0 46px}
+.ledger::before{content:"";position:absolute;top:0;bottom:0;left:48px;border-left:2px solid var(--margin);opacity:.8}
+.ledger h2{font:italic 400 18px/32px "Tiro Kannada",Georgia,serif;color:var(--ink-soft);margin:0 0 14px}
+.entry{font:400 17px/32px "Tiro Kannada",Georgia,serif;color:var(--ink);margin:0;display:grid;grid-template-columns:1fr auto;gap:12px}
+.entry .amt{text-align:right;white-space:nowrap}
+.entry.flag .amt{color:var(--margin)}
+.entry small{grid-column:1/-1;font:italic 15px/32px "Tiro Kannada",Georgia,serif;color:var(--ink-soft);margin-top:-6px}
+.entry.struck span:first-child{text-decoration:line-through;text-decoration-color:var(--margin)}
+.ledger .total{border-top:3px double var(--ink);margin-top:10px;padding-top:4px;font:600 17px/32px Hind,sans-serif;color:var(--ink);display:flex;justify-content:space-between}
+@media (prefers-reduced-motion:no-preference){
+  .entry,.ledger .total{opacity:0;animation:write .6s ease-out forwards}
+  .entry:nth-of-type(1){animation-delay:.3s}.entry:nth-of-type(2){animation-delay:.9s}.entry:nth-of-type(3){animation-delay:1.5s}
+  .entry:nth-of-type(4){animation-delay:2.1s}.entry:nth-of-type(5){animation-delay:2.7s}.ledger .total{animation-delay:3.4s}
+  @keyframes write{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+}
+
+section{padding:64px 0;border-top:1px solid var(--rule)}
+h2.sec{font:400 clamp(28px,3.4vw,38px)/1.15 "Tiro Kannada",Georgia,serif;margin:0 0 20px;max-width:24em}
+p{max-width:38em}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+.quote{font:italic 21px/1.5 "Tiro Kannada",Georgia,serif;color:var(--ink);border-left:3px solid var(--marigold);padding:4px 0 4px 18px;margin:20px 0}
+.quote cite{display:block;font:400 15px Hind,sans-serif;color:var(--ink-soft);margin-top:6px}
+
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
+ol.steps li{counter-increment:s;position:relative;padding-top:56px}
+ol.steps li::before{content:counter(s);position:absolute;top:0;left:0;width:40px;height:40px;border-radius:50%;
+  background:var(--marigold);color:#2a1a00;font:600 20px/40px Hind,sans-serif;text-align:center}
+ol.steps h3{font:600 19px/1.3 Hind,sans-serif;margin:0 0 6px}
+ol.steps p{font-size:16px;margin:0;color:var(--text)}
+ol.steps .who{display:block;font-size:14px;color:var(--ink-soft);margin-top:8px}
+
+table{border-collapse:collapse;width:100%;max-width:760px;font-size:17px;margin-top:20px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule)}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.key td{font-weight:600}
+.note{font-size:15px;color:var(--ink-soft);max-width:42em}
+
+.trust{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-top:24px}
+.trust h3{font:400 23px/1.25 "Tiro Kannada",Georgia,serif;margin:0 0 8px;color:var(--ink)}
+.trust p{font-size:16px;margin:0}
+
+footer{background:var(--cloth);color:#fff7e0;padding:36px 0 44px;margin-top:40px;position:relative}
+footer::before{content:"";position:absolute;left:0;right:0;top:10px;border-top:2px dashed var(--thread);opacity:.85}
+footer p{max-width:46em;font-size:15px;margin:8px 0}
+
+@media (max-width:860px){
+  .hero,.cols,.trust{grid-template-columns:1fr}
+  ol.steps{grid-template-columns:1fr 1fr}
+  .ledger{padding-left:52px}.ledger::before{left:38px}
+}
+@media (max-width:520px){ol.steps{grid-template-columns:1fr}.entry{grid-template-columns:1fr}.entry .amt{text-align:left}}
+</style>
+</head>
+<body>
+<header class="cover"><div class="wrap">
+  <a class="mark" href="#top" aria-label="Ghost Ledger home">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><g fill="#f2a007">
+      <circle cx="17" cy="17" r="15"/></g><g fill="#e07b00"><circle cx="17" cy="17" r="10"/></g><g fill="#f7c948"><circle cx="17" cy="17" r="5"/></g>
+      <g stroke="#8f1d1d" stroke-width="1.3" fill="none" opacity=".55"><circle cx="17" cy="17" r="12.5"/><circle cx="17" cy="17" r="7.5"/></g></svg>
+    Ghost Ledger
+  </a>
+  <nav><a href="#how">How it works</a><a href="#results">Results</a><a href="{{DEMO_URL}}">Demo report</a><a href="{{REPO_URL}}">Code</a></nav>
+</div></header>
+
+<main id="top" class="wrap">
+  <div class="hero">
+    <div>
+      <h1>When someone dies, their money doesn't tell the family where it is.</h1>
+      <p class="lede">Ghost Ledger reads a loved one's mailbox on your own computer and writes down every deposit, policy, folio and pension it finds, with the email that proves each one. Then it helps you claim them, one approved letter at a time.</p>
+      <div class="actions">
+        <a class="btn primary" href="{{VIDEO_URL}}">Watch the 3-minute demo</a>
+        <a class="btn quiet" href="{{REPO_URL}}">Get the code</a>
+      </div>
+    </div>
+    <div class="ledger" role="img" aria-label="A ledger page listing what Raghavendra Rao left behind">
+      <h2>Raghavendra Rao, 1958–2026 · found in his mailbox</h2>
+      <p class="entry flag"><span>Fixed deposit, Malnad Co-op Bank ···7703</span><span class="amt">₹4,29,812</span><small>matured 2024, never collected. Two emails in seven years.</small></p>
+      <p class="entry flag"><span>Life policy, Nilgiri Life ···3958</span><span class="amt">matured, unpaid</span></p>
+      <p class="entry flag"><span>Physical shares, Hampi Textiles ···2117</span><span class="amt">IEPF risk</span></p>
+      <p class="entry"><span>StreamBox Premium, card ···9012</span><span class="amt">₹499 / month</span><small>still charging, three months after he died.</small></p>
+      <p class="entry struck"><span>Savings, Coastal Bank ···2210</span><span class="amt">closed 2021</span></p>
+      <div class="total"><span>{{G_HOLDINGS}} holdings · {{G_SCAMS}} scam emails ignored</span><span>0 invented</span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="cols">
+      <div>
+        <h2 class="sec">₹2.2 lakh crore is waiting to be claimed in India.</h2>
+        <p>That is the total sitting unclaimed in bank deposits, shares, insurance, provident fund and mutual funds, according to a 1 Finance analysis reported in December 2025. A large share of it belonged to people who died, and whose families never found out what they had.</p>
+        <p>Nobody keeps a list. Statements go to one person's inbox for years: an FD renewal notice here, a policy premium receipt there, a dividend email from a company he bought shares in before the internet. When that person dies, the inbox is the only map.</p>
+      </div>
+      <div>
+        <p class="quote">“Our records show that the maturity amount for policy no. XXXXX3958 is still unpaid as the discharge requirements have not been received.”<cite>Nilgiri Life Insurance, May 2023. One of two emails about this policy in four years.</cite></p>
+        <p>Raghavendra Rao is fictional. His mailbox is 75 synthetic emails written to look like a real Indian retiree's, including six scam emails pretending to be his bank, four promotions that name funds he never held, and one account he closed years before he died. Every number on this site comes from running Ghost Ledger on it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2 class="sec">How it works</h2>
+    <ol class="steps">
+      <li><h3>Load the mailbox</h3><p>A Google Takeout export or a folder of emails. A quick filter keeps only mail that mentions accounts or money, and code-level checks set aside scams.</p><span class="who">Runs offline</span></li>
+      <li><h3>Gemma reads each email</h3><p>Gemma 4 on your laptop lists what each email shows he held, owed or paid for, and copies the sentence that says so.</p><span class="who">Gemma 4 E4B via Ollama, no cloud</span></li>
+      <li><h3>Every line is checked</h3><p>The quote must really be in the email, the institution must be named, the account number must appear. Anything that fails gets one retry, then it is dropped. It never guesses.</p><span class="who">Plain code, after the model</span></li>
+      <li><h3>Claims are followed up for months</h3><p>Each claim letter waits for your approval on your phone, goes out from your Gmail, and is chased after 15 days of silence. After two reminders, it drafts the complaint to the regulator.</p><span class="who">Temporal + Auth0</span></li>
+    </ol>
+  </section>
+
+  <section id="results">
+    <h2 class="sec">Measured on the synthetic estate</h2>
+    <p>Same mailbox, same filters and the same checks, so the only difference is who reads the email: Gemma, or a regex baseline written the usual way.</p>
+    {{EVAL_TABLE}}
+    <p class="note">{{EVAL_NOTE}}</p>
+  </section>
+
+  <section>
+    <h2 class="sec">Built for a family on its worst week</h2>
+    <div class="trust">
+      <div><h3>The mailbox never leaves the laptop</h3><p>A dead parent's email holds their whole life. Gemma is an open model that runs on an ordinary laptop CPU, so no email is uploaded anywhere. That is why this has to be open: you can read every line of what touches it.</p></div>
+      <div><h3>Nothing is sent without you</h3><p>Every letter triggers an Auth0 Guardian push naming the bank and the account. Gmail access lives in Auth0 Token Vault, not on disk, and is used for minutes at a time.</p></div>
+      <div><h3>It keeps going when you can't</h3><p>Claims take months. Each one is a Temporal workflow that survives reboots and closed lids, waits out 15-day silences on a durable timer, and remembers exactly where it stopped.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Ghost Ledger</strong> is open source ({{LICENSE}}). It gives general guidance from public sources such as RBI, SEBI, AMFI, IEPF, EPFO and insurers. It is not legal advice.</p>
+  <p>Built for the DEV Hacktoberfest Open-Source AI Challenge, “Ghost in the Machine”. Marigolds guide the dead home on Día de los Muertos and line every funeral in India. This one helps what they left behind find its way home.</p>
+  <p><a href="{{REPO_URL}}">Code</a> · <a href="{{DEMO_URL}}">Demo report</a> · <a href="{{POST_URL}}">Write-up</a></p>
+</div></footer>
+</body>
+</html>

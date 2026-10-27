@@ -9,3 +9,5 @@ mailbox/
 *.mbox
 .secrets/
 .env
+eval/
+site/dist/

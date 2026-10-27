@@ -98,7 +98,7 @@ def page(holdings: list[Holding], ignored: list[dict], est: Estate, n_emails: in
 <span class="ref">{_e('XXXX' + h.last4) if h.last4 else ''}</span>
 <span class="status">{_e(STATUS_WORDS.get(h.status, h.status))} · {len(h.evidence)} email{'s' if len(h.evidence) != 1 else ''}, {h.first_seen} → {h.last_seen}</span></div>
 <blockquote>“{_e(mask(ev['quote']))}”<cite>email of {ev['date']}</cite></blockquote>{ghost}
-<p class="how"><b>{_e(r['who'].capitalize()) if r['who'] else ''}</b> {_e(r['how'])}<small>{_e(r['portal'])}</small></p></div>""")
+<p class="how"><b>{_e(r['who'][:1].upper() + r['who'][1:])}</b> {_e(r['how'])}<small>{_e(r['portal'])}</small></p></div>""")
     scams = "".join(f"<li>{_e(x['date'])} · “{_e(x['subject'])}”<br><code>{_e(x['sender'])}</code> — {_e('; '.join(x['why']))}</li>"
                     for x in ignored)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
