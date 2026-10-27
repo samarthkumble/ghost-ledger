@@ -9,5 +9,9 @@ mailbox/
 *.mbox
 .secrets/
 .env
-eval/
+eval/*
+!eval/results-estate.json
+!eval/results-estate2.json
+!eval/results-estate.md
+!eval/results-estate2.md
 site/dist/

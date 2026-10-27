@@ -1,0 +1,79 @@
+{
+ "results": {
+  "regex baseline": {
+   "holdings_found": "7/13",
+   "subscriptions_found": "1/4",
+   "invented": 1,
+   "wrong_kind": 4,
+   "wrong_institution": 0,
+   "duplicates": 0,
+   "status_correct": "8/8",
+   "flagged_statuses_correct": "2/4",
+   "closed_account_claimed": 0,
+   "scam_emails_used": 0,
+   "promo_emails_used": 0,
+   "masking_leaks": 0,
+   "_missed": [
+    "B1",
+    "B12",
+    "B2",
+    "B3",
+    "B7",
+    "B8",
+    "T2",
+    "T3",
+    "U1"
+   ],
+   "_invented": [
+    "other Kochi Metro 3388"
+   ],
+   "_duplicates": [],
+   "_wrong_kind": {
+    "B7": "mutual_fund",
+    "B8": "bank_account",
+    "B12": "life_insurance",
+    "B1": "fixed_deposit"
+   },
+   "_wrong_institution": {},
+   "_wrong_status": {},
+   "_leaks": []
+  },
+  "gemma4:e4b": {
+   "holdings_found": "13/13",
+   "subscriptions_found": "4/4",
+   "invented": 1,
+   "wrong_kind": 0,
+   "wrong_institution": 0,
+   "duplicates": 0,
+   "status_correct": "17/17",
+   "flagged_statuses_correct": "4/4",
+   "closed_account_claimed": 0,
+   "scam_emails_used": 0,
+   "promo_emails_used": 0,
+   "masking_leaks": 0,
+   "_missed": [],
+   "_invented": [
+    "utility Kochi Metro "
+   ],
+   "_duplicates": [],
+   "_wrong_kind": {},
+   "_wrong_institution": {},
+   "_wrong_status": {},
+   "_leaks": []
+  }
+ },
+ "runs": {
+  "regex baseline": {
+   "emails_read": 31,
+   "retried": 0,
+   "median_s_per_email": null,
+   "wall_s": 0
+  },
+  "gemma4:e4b": {
+   "emails_read": 31,
+   "retried": 0,
+   "median_s_per_email": 17.9,
+   "wall_s": 0
+  }
+ }
+}

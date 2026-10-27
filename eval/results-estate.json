@@ -1,0 +1,75 @@
+{
+ "results": {
+  "regex baseline": {
+   "holdings_found": "11/15",
+   "subscriptions_found": "3/5",
+   "invented": 0,
+   "wrong_kind": 3,
+   "wrong_institution": 3,
+   "duplicates": 0,
+   "status_correct": "14/14",
+   "flagged_statuses_correct": "4/5",
+   "closed_account_claimed": 0,
+   "scam_emails_used": 0,
+   "promo_emails_used": 0,
+   "masking_leaks": 0,
+   "_missed": [
+    "A10",
+    "A7",
+    "A8",
+    "A9",
+    "S1",
+    "S4"
+   ],
+   "_invented": [],
+   "_duplicates": [],
+   "_wrong_kind": {
+    "A10": "mutual_fund",
+    "S1": "life_insurance",
+    "S2": "utility"
+   },
+   "_wrong_institution": {
+    "A9": "Deccan Cements Ltd - Registrar",
+    "A7": "Consolidated Investor Services",
+    "A8": "Consolidated Investor Services"
+   },
+   "_wrong_status": {},
+   "_leaks": []
+  },
+  "gemma4:e4b": {
+   "holdings_found": "15/15",
+   "subscriptions_found": "5/5",
+   "invented": 0,
+   "wrong_kind": 0,
+   "wrong_institution": 0,
+   "duplicates": 0,
+   "status_correct": "20/20",
+   "flagged_statuses_correct": "5/5",
+   "closed_account_claimed": 0,
+   "scam_emails_used": 0,
+   "promo_emails_used": 0,
+   "masking_leaks": 0,
+   "_missed": [],
+   "_invented": [],
+   "_duplicates": [],
+   "_wrong_kind": {},
+   "_wrong_institution": {},
+   "_wrong_status": {},
+   "_leaks": []
+  }
+ },
+ "runs": {
+  "regex baseline": {
+   "emails_read": 51,
+   "retried": 0,
+   "median_s_per_email": null,
+   "wall_s": 0
+  },
+  "gemma4:e4b": {
+   "emails_read": 51,
+   "retried": 0,
+   "median_s_per_email": 20.3,
+   "wall_s": 0
+  }
+ }
+}
