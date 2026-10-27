@@ -1,0 +1,409 @@
+person: Raghavendra Rao (1958-2026), retired school teacher, Mysuru. Fictional.
+executor: Ananya Rao (daughter). Fictional.
+date_of_death: '2026-06-21'
+items:
+  A1:
+    kind: bank_account
+    institution: Kaveri Bank
+    ident: '4821'
+    status: active
+    note: Savings account; pension and SGB interest are credited here.
+  A2:
+    kind: fixed_deposit
+    institution: Malnad Co-operative Bank
+    ident: '7703'
+    status: matured_unclaimed
+    note: 'Forgotten FD: only two emails in seven years.'
+  A3:
+    kind: bank_account
+    institution: Coastal Bank
+    ident: '2210'
+    status: closed
+    note: 'TRAP: closed in 2021. Must not be listed as something to claim.'
+  A4:
+    kind: life_insurance
+    institution: Nilgiri Life Insurance
+    ident: '4471'
+    status: active
+  A5:
+    kind: life_insurance
+    institution: Nilgiri Life Insurance
+    ident: '3958'
+    status: matured_unclaimed
+    note: Matured in 2022, never paid out.
+  A6:
+    kind: health_insurance
+    institution: Sahyadri Health Insurance
+    ident: '8820'
+    status: active
+    note: No payout on death; inform insurer, keep spouse covered.
+  A7:
+    kind: mutual_fund
+    institution: Tungabhadra Mutual Fund
+    ident: '3341'
+    status: active
+  A8:
+    kind: mutual_fund
+    institution: Western Ghats Mutual Fund
+    ident: '7098'
+    status: active
+    note: 'No nominee: claim needs legal-heir documents.'
+  A9:
+    kind: demat
+    institution: Bharat Securities
+    ident: '6650'
+    status: active
+  A10:
+    kind: shares_physical
+    institution: Hampi Textiles
+    ident: '2117'
+    status: at_risk_iepf
+    note: Physical shares, unclaimed dividends, may already be with IEPF.
+  A11:
+    kind: provident_fund
+    institution: EPFO
+    ident: '1187'
+    status: inoperative
+  A12:
+    kind: ppf
+    institution: Kaveri Bank
+    ident: 0912
+    status: active
+  A13:
+    kind: credit_card
+    institution: Kaveri Bank
+    ident: '9012'
+    status: active
+    note: 'Liability: inform the bank, stop auto-debits.'
+  A14:
+    kind: pension
+    institution: Kaveri Bank
+    ident: '1604'
+    status: active
+    note: Stop the pension; spouse may apply for family pension.
+  A15:
+    kind: gold_bond
+    institution: Kaveri Bank
+    ident: '2731'
+    status: active
+  S1:
+    kind: subscription
+    institution: StreamBox
+    ident: ''
+    status: active
+  S2:
+    kind: subscription
+    institution: Airwave Telecom
+    ident: '3021'
+    status: active
+  S3:
+    kind: subscription
+    institution: The Mysuru Daily
+    ident: '7812'
+    status: active
+  S4:
+    kind: subscription
+    institution: ChessMasters Pro
+    ident: ''
+    status: active
+  U1:
+    kind: utility
+    institution: Mysuru Power Supply
+    ident: '4817'
+    status: active
+traps:
+  closed:
+  - A3
+  scam_emails:
+  - scm-0
+  - scm-1
+  - scm-2
+  - scm-3
+  - scm-4
+  - scm-5
+  promo_emails:
+  - pro-0
+  - pro-1
+  - pro-2
+  - pro-3
+emails:
+  kav-sb-0:
+    kind: asset
+    refs:
+    - A1
+  kav-sb-1:
+    kind: asset
+    refs:
+    - A1
+  kav-sb-2:
+    kind: asset
+    refs:
+    - A1
+  kav-sb-3:
+    kind: asset
+    refs:
+    - A1
+  kav-sb-4:
+    kind: asset
+    refs:
+    - A1
+  kav-sb-5:
+    kind: asset
+    refs:
+    - A1
+  kav-pen-0:
+    kind: asset
+    refs:
+    - A14
+  kav-pen-1:
+    kind: asset
+    refs:
+    - A14
+  kav-pen-2:
+    kind: asset
+    refs:
+    - A14
+  kav-sgb-0:
+    kind: asset
+    refs:
+    - A15
+  kav-sgb-1:
+    kind: asset
+    refs:
+    - A15
+  kav-ppf-0:
+    kind: asset
+    refs:
+    - A12
+  kav-ppf-1:
+    kind: asset
+    refs:
+    - A12
+  kav-cc-0:
+    kind: liability
+    refs:
+    - A13
+  kav-cc-1:
+    kind: liability
+    refs:
+    - A13
+  kav-cc-2:
+    kind: liability
+    refs:
+    - A13
+  mal-fd-0:
+    kind: asset
+    refs:
+    - A2
+  mal-fd-1:
+    kind: asset
+    refs:
+    - A2
+  cst-sb-0:
+    kind: asset_closed
+    refs:
+    - A3
+  cst-sb-1:
+    kind: asset_closed
+    refs:
+    - A3
+  nil-a-0:
+    kind: asset
+    refs:
+    - A4
+  nil-a-1:
+    kind: asset
+    refs:
+    - A4
+  nil-a-2:
+    kind: asset
+    refs:
+    - A4
+  nil-a-3:
+    kind: asset
+    refs:
+    - A4
+  nil-a-r:
+    kind: asset
+    refs:
+    - A4
+  nil-b-0:
+    kind: asset
+    refs:
+    - A5
+  nil-b-1:
+    kind: asset
+    refs:
+    - A5
+  sah-0:
+    kind: asset
+    refs:
+    - A6
+  sah-1:
+    kind: asset
+    refs:
+    - A6
+  cas-0:
+    kind: asset
+    refs:
+    - A7
+    - A8
+  cas-1:
+    kind: asset
+    refs:
+    - A7
+    - A8
+  cas-2:
+    kind: asset
+    refs:
+    - A7
+    - A8
+  cas-3:
+    kind: asset
+    refs:
+    - A7
+    - A8
+  dmt-0:
+    kind: asset
+    refs:
+    - A9
+  dmt-1:
+    kind: asset
+    refs:
+    - A9
+  dmt-2:
+    kind: asset
+    refs:
+    - A9
+  dmt-div-0:
+    kind: asset
+    refs:
+    - A9
+  hmp-0:
+    kind: asset
+    refs:
+    - A10
+  epf-0:
+    kind: asset
+    refs:
+    - A11
+  epf-1:
+    kind: asset
+    refs:
+    - A11
+  sbx-0:
+    kind: subscription
+    refs:
+    - S1
+  sbx-1:
+    kind: subscription
+    refs:
+    - S1
+  sbx-2:
+    kind: subscription
+    refs:
+    - S1
+  air-0:
+    kind: subscription
+    refs:
+    - S2
+  air-1:
+    kind: subscription
+    refs:
+    - S2
+  mdy-0:
+    kind: subscription
+    refs:
+    - S3
+  mdy-1:
+    kind: subscription
+    refs:
+    - S3
+  chs-0:
+    kind: subscription
+    refs:
+    - S4
+  pwr-0:
+    kind: utility
+    refs:
+    - U1
+  pwr-1:
+    kind: utility
+    refs:
+    - U1
+  pro-0:
+    kind: promo
+    refs: []
+  pro-1:
+    kind: promo
+    refs: []
+  pro-2:
+    kind: promo
+    refs: []
+  pro-3:
+    kind: promo
+    refs: []
+  scm-0:
+    kind: scam
+    refs:
+    - A1
+  scm-1:
+    kind: scam
+    refs: []
+  scm-2:
+    kind: scam
+    refs: []
+  scm-3:
+    kind: scam
+    refs: []
+  scm-4:
+    kind: scam
+    refs: []
+  scm-5:
+    kind: scam
+    refs: []
+  life-00:
+    kind: personal
+    refs: []
+  life-01:
+    kind: personal
+    refs: []
+  life-02:
+    kind: personal
+    refs: []
+  life-03:
+    kind: personal
+    refs: []
+  life-04:
+    kind: personal
+    refs: []
+  life-05:
+    kind: personal
+    refs: []
+  life-06:
+    kind: personal
+    refs: []
+  life-07:
+    kind: personal
+    refs: []
+  life-08:
+    kind: personal
+    refs: []
+  life-09:
+    kind: personal
+    refs: []
+  life-10:
+    kind: personal
+    refs: []
+  life-11:
+    kind: personal
+    refs: []
+  life-12:
+    kind: personal
+    refs: []
+  life-13:
+    kind: personal
+    refs: []
+  life-14:
+    kind: personal
+    refs: []

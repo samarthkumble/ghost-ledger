@@ -1,0 +1,7 @@
+# Who died and who is handling the estate. Fictional demo values.
+deceased: Raghavendra Rao
+date_of_death: "2026-06-21"
+executor: Ananya Rao
+relation: daughter
+executor_email: ananya.rao@mail.example
+city: Mysuru

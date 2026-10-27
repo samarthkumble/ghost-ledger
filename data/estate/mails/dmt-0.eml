@@ -1,0 +1,15 @@
+From: National Depository CAS <cas@ndepository.example>
+To: Raghavendra Rao <raghu.rao1958@mail.example>
+Subject: Your Consolidated Account Statement (demat)
+Date: Thu, 09 Mar 2023 09:30:00 +0530
+Message-ID: <dmt-0@estate.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+NDS CAS for the month ending 2023-03
+Demat account: Bharat Securities Ltd. - DP ID IN301926 Client ID XXXX6650
+Holdings:
+  DECCAN CEMENTS LTD        INE00DC01017    120 shares    Value Rs. 31,440.00
+  HAMPI TEXTILES LTD        INE00HT01022     40 shares    Value Rs. 5,212.00
+Total portfolio value: Rs. 36,652.00

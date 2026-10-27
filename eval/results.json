@@ -1,0 +1,48 @@
+{
+ "results": {
+  "regex baseline": {
+   "holdings_found": "11/15",
+   "subscriptions_found": "3/5",
+   "invented": 1,
+   "wrong_kind": 3,
+   "wrong_institution": 3,
+   "status_correct": "14/14",
+   "flagged_statuses_correct": "4/5",
+   "closed_account_claimed": 0,
+   "scam_emails_used": 0,
+   "promo_emails_used": 0,
+   "masking_leaks": 0,
+   "_missed": [
+    "A10",
+    "A7",
+    "A8",
+    "A9",
+    "S1",
+    "S4"
+   ],
+   "_invented": [
+    "bank_account Deccan Cements Ltd - Registrar 6650"
+   ],
+   "_wrong_kind": {
+    "A10": "mutual_fund",
+    "S1": "life_insurance",
+    "S2": "utility"
+   },
+   "_wrong_institution": {
+    "A9": "National Depository CAS",
+    "A7": "Consolidated Investor Services",
+    "A8": "Consolidated Investor Services"
+   },
+   "_wrong_status": {},
+   "_leaks": []
+  }
+ },
+ "runs": {
+  "regex baseline": {
+   "emails_read": 51,
+   "retried": 0,
+   "median_s_per_email": null,
+   "wall_s": 0
+  }
+ }
+}
