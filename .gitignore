@@ -15,3 +15,5 @@ eval/*
 !eval/results-estate.md
 !eval/results-estate2.md
 site/dist/
+*.tar.gz
+*.tgz
